@@ -1,0 +1,194 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<head>
+    <title>Rearrange Table Columns</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<h2>Index</h2>
+
+<h1 id="header"></h1>
+
+
+<table id="rearrangeableTable">
+    <thead>
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Row 1, Col 1</td>
+            <td>Row 1, Col 2</td>
+            <td>Row 1, Col 3</td>
+        </tr>
+        <tr>
+            <td>Row 2, Col 1</td>
+            <td>Row 2, Col 2</td>
+            <td>Row 2, Col 3</td>
+        </tr>
+        <tr>
+            <td>Row 3, Col 1</td>
+            <td>Row 3, Col 2</td>
+            <td>Row 3, Col 3</td>
+        </tr>
+        <!-- More rows as needed -->
+    </tbody>
+</table>
+
+@*<div>
+        <h4>Id = </h4><h4 id="id"></h4>
+                      <h4>Name = </h4><h4 id="name"></h4>
+                                      <h4>Decsription = </h4><h4 id="desc"></h4>
+
+    </div>
+        <input type="button" onclick="onClick()" title="Get" value="GET" />
+    <br />
+    <br />
+    <br />
+
+    <div>
+
+        <form>
+            <input type="text" id="idn" placeholder="id" />
+            <br />
+            <br />
+            <input type="text" id="namen" placeholder="Name" />
+            <br />
+            <br />
+            <input type="text" id="descn" placeholder="Description" />
+            <br />
+            <br />
+            <input type="button" value="Submit" onclick="btnClick()" />
+        </form>
+    </div>*@
+
+<script>
+
+    //function onClick() {
+
+    //    $.ajax({
+    //        url: "/Home/Test",
+    //        method: "GET",
+    //        success: function (data) {
+    //            console.log(data);
+    //            data = JSON.parse(data);
+    //            console.log(data);
+
+    //            $("#id").text(data.Id);
+    //            $("#name").text(data.TaskName);
+    //            $("#desc").text(data.Description);
+    //        },
+    //        error: function (err) {
+    //            console.error(err);
+    //        }
+    //    })
+    //}
+
+    //function btnClick() {
+    //    var id = $("#idn").val();
+    //    var name = $("#namen").val();
+    //    var desc = $("#descn").val();
+
+    //    obj = {
+    //        Id: id,
+    //        TaskName: name,
+    //        Description: desc
+    //    };
+
+    //    Submit(obj);
+
+    //    function Submit(obj) {
+    //        $.ajax({
+    //            url: "/Home/Add",
+    //            method: "post",
+    //            data: obj,
+    //            success: function (data) {
+    //                console.log(data);
+    //            },
+    //            error: function (err) {
+    //                console.error(err);
+    //            }
+    //        })
+    //    }
+    //}
+
+
+    //$(document).ready(function () {
+    //    var table = $("#rearrangeableTable");
+    //    var tbody = table.find('tbody');
+
+    //    // Make the headers draggable
+    //    table.find('th').mousedown(function () {
+    //        var idx = $(this).index();
+
+    //        // Make the column cells draggable
+    //        tbody.find('td').each(function () {
+    //            var cell = $(this);
+    //            cell.attr('data-col-idx', idx);
+    //        });
+    //    });
+
+    //    // Apply jQuery UI sortable to the table headers
+    //    table.find('thead tr').sortable({
+    //        items: 'th',
+    //        stop: function (event, ui) {
+    //            var startIndex = ui.item.attr('data-col-idx');
+    //            var newIndex = ui.item.index();
+
+    //            moveTableColumn(tbody, startIndex, newIndex);
+    //        }
+    //    });
+
+    //    // Function to move table columns
+    //    function moveTableColumn(tbody, fromIndex, toIndex) {
+    //        var rows = tbody.find('tr');
+    //        rows.each(function () {
+    //            var row = $(this);
+    //            var cell = row.find('td').eq(fromIndex).detach();
+
+    //            if (toIndex >= fromIndex) {
+    //                row.find('td').eq(toIndex).after(cell);
+    //            } else {
+    //                row.find('td').eq(toIndex).before(cell);
+    //            }
+    //        });
+    //    }
+    //});
+
+    $(document).ready(function () {
+        $("#rearrangeableTable tbody").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection();
+
+        function fixHelperModified(e, tr) {
+            var $originals = tr.children();
+            var $helper = tr.clone();
+            $helper.children().each(function (index) {
+                $(this).width($originals.eq(index).width());
+            });
+            return $helper;
+        }
+
+        function updateIndex(e, ui) {
+            // After the row is reordered, this function will be called
+            // Optionally, you can update the index or perform other actions here
+        }
+    });
+
+
+
+</script>
+<br />
+<br />
+<br />
+<br />
+<div>
+    @Html.ActionLink("Back to List", "GetAllTasks")
+</div>

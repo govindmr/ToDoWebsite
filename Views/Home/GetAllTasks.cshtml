@@ -1,0 +1,132 @@
+﻿@model IEnumerable<ToDOListModel.ToDOListEntity>
+
+@{
+    ViewBag.Title = "GetAllTasks";
+}
+<head>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<h2 style="contain-intrinsic-width:revert-layer">TASKS</h2>
+
+<p>
+    @Html.ActionLink("Add New", "Create", "Home", null, new { @class = "btn btn-primary" })
+</p>
+<table class="table">
+    <tr>
+        <td><input type="checkbox" class="head-checkbox" disabled="disabled" /></td>
+        
+        <th>
+            @Html.DisplayNameFor(model => model.TaskName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.Hidden("Status")
+        </th>
+        <th>Status</th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr id="@(item.Id)">
+        <td><input type="checkbox" onclick="checkBoxClick()" class="row-checkbox" /></td>
+        
+        <td>
+            @Html.DisplayFor(modelItem => item.TaskName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.HiddenFor(modelItem => item.Status, new { @class = "status-value" })
+        </td>
+        <td id="column">Completed</td>
+        <td>
+            @Html.ActionLink("Edit", "Update", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+            @Html.ActionLink("Details", "GetTask", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-primary" })
+        </td>
+    </tr>
+}
+
+</table>
+<script>
+
+    $(document).ready()
+    {
+
+
+        $('.table tr').each(function () {
+            var tableRow = $(this).closest('tr');
+            var status = $(this).find(".status-value").val();
+            if (status != undefined && status != null && status == "Y") {
+                tableRow.find(".row-checkbox").prop('checked', true);
+                tableRow.css('background-color', 'pink');
+                tableRow.find("#column").text('Completed');
+            }
+            else {
+                tableRow.css('background-color', 'white');
+                tableRow.find("#column").text('Pending');
+            }
+        });
+
+        function checkBoxClick() {
+            const self = $(this);
+            $('tr .row-checkbox').each(function () {
+                var closestTrId = $(this).closest('tr').attr('id');
+                var checkedRow = $(this).closest('tr');
+
+                if (this.checked) {
+                    checkedRow.css('background-color', 'pink');
+                    checkedRow.find("#column").text('Completed');
+                    obj = {
+                        Id: closestTrId,
+                        TaskName: checkedRow[0].cells[1].innerText,
+                        Description: checkedRow[0].cells[2].innerText,
+                        Status: "Y"
+                    };
+                    $.ajax({
+                        url: '/Home/Update',
+                        method: 'post',
+                        data: obj,
+                        success: function (data) {
+                            
+                        },
+                        error: function (err) {
+                            console.log(error);
+                        }
+                    });
+                }
+                else {
+                    checkedRow.css('background-color', 'white');
+                    checkedRow.find("#column").text('Pending');
+                    obj = {
+                        Id: closestTrId,
+                        TaskName: checkedRow[0].cells[1].innerText,
+                        Description: checkedRow[0].cells[2].innerText,
+                        Status: "N"
+
+                    };
+                    $.ajax({
+                        url: '/Home/Update',
+                        method: 'post',
+                        data: obj,
+                        success: function (data) {
+                            
+                        },
+                        error: function (err) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+
+        }
+    }
+
+</script>
+<br />
+<br />
