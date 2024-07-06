@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<ToDOListModel.ToDOListEntity>
+
 @{
     ViewBag.Title = "Index";
 }
@@ -19,6 +20,7 @@
             <th>Header 1</th>
             <th>Header 2</th>
             <th>Header 3</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -37,8 +39,28 @@
             <td>Row 3, Col 2</td>
             <td>Row 3, Col 3</td>
         </tr>
-        <!-- More rows as needed -->
-    </tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><input type="checkbox" onclick="checkBoxClick()" class="row-checkbox" /></td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaskName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.HiddenFor(modelItem => item.Status, new { @class = "status-value" })
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Update", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+                    @Html.ActionLink("Details", "GetTask", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-primary" })
+                </td>
+            </tr>
+        }
+            <!-- More rows as needed -->
+        </tbody>
 </table>
 
 @*<div>

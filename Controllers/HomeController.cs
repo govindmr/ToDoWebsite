@@ -23,7 +23,8 @@ namespace ToDoWebsite.Controllers
         // GET: Home
         public ActionResult Index()
         {
-            return View();
+            var result = repository.GetAllTasks();
+            return View(result);
         }
         public ActionResult Create()
         {
@@ -54,8 +55,9 @@ namespace ToDoWebsite.Controllers
 
         public ActionResult GetAllTasks()
         {
-            var result = repository.GetAllTasks();  
-            return View(result);
+            var result = repository.GetAllTasks();
+            var results = result.OrderBy(x => x.SortOrder);
+            return View(results);
         }
 
         public ActionResult GetTask(int id)
@@ -76,6 +78,16 @@ namespace ToDoWebsite.Controllers
             if (model != null)
             {
                 var result = repository.Update(model.Id, model);
+            }
+            return RedirectToAction("GetAllTasks");
+        }
+
+        [HttpPost]
+        public ActionResult UpdateSortOrder(ToDOListEntity[] model)
+        {
+            if (model != null)
+            {
+                var result = repository.UpdateSortOrder(model);
             }
             return RedirectToAction("GetAllTasks");
         }

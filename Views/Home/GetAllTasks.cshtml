@@ -13,22 +13,24 @@
 <p>
     @Html.ActionLink("Add New", "Create", "Home", null, new { @class = "btn btn-primary" })
 </p>
-<table class="table">
-    <tr>
-        <td><input type="checkbox" class="head-checkbox" disabled="disabled" /></td>
-        
-        <th>
-            @Html.DisplayNameFor(model => model.TaskName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.Hidden("Status")
-        </th>
-        <th>Status</th>
-        <th></th>
-    </tr>
+<table id="rearrangeableTable" class="table">
+    <thead>
+        <tr>
+            <th><input type="checkbox" class="head-checkbox" disabled="disabled" /></th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.TaskName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.Hidden("Status")
+            </th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
 
 @foreach (var item in Model) {
     <tr id="@(item.Id)">
@@ -57,6 +59,45 @@
 
     $(document).ready()
     {
+        
+        $("#rearrangeableTable tbody").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection();
+
+        function fixHelperModified(e, tr) {
+            var $originals = tr.children();
+            var $helper = tr.clone();
+            $helper.children().each(function (index) {
+                $(this).width($originals.eq(index).width());
+            });
+            return $helper;
+        }
+
+        function updateIndex(e, ui) {
+            
+            var order = [];
+            $("#rearrangeableTable tbody tr").each(function (index, element) {
+                order.push({
+                    Id: $(this).closest('tr').attr('id'),
+                    SortOrder: index + 1
+                });
+            });
+
+            
+            $.ajax({
+                url: '/Home/UpdateSortOrder',  
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(order),
+                success: function (response) {
+                    console.log('Order saved successfully');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('Error saving order');
+                }
+            });
+        }
 
 
         $('.table tr').each(function () {
