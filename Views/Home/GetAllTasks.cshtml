@@ -11,8 +11,11 @@
 <h2 style="contain-intrinsic-width:revert-layer">TASKS</h2>
 
 <p>
-    @Html.ActionLink("Add New", "Create", "Home", null, new { @class = "btn btn-primary" })
-</p>
+    @if (User.IsInRole("Admin") || User.IsInRole("Customer"))
+    {
+        @Html.ActionLink("Add New", "Create", "Home", null, new { @class = "btn btn-primary" })
+    }
+    </p>
 <table id="rearrangeableTable" class="table">
     <thead>
         <tr>
@@ -34,22 +37,23 @@
 
 @foreach (var item in Model) {
     <tr id="@(item.Id)">
-        <td><input type="checkbox" onclick="checkBoxClick()" class="row-checkbox" /></td>
+        <td><input type="checkbox" class="row-checkbox" /></td>
         
         <td>
             @Html.DisplayFor(modelItem => item.TaskName)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Description)
+            @Html.Raw(item.Description)
         </td>
         <td>
             @Html.HiddenFor(modelItem => item.Status, new { @class = "status-value" })
         </td>
         <td id="column">Completed</td>
         <td>
-            @Html.ActionLink("Edit", "Update", new { id = item.Id }, new { @class = "btn btn-primary" }) |
-            @Html.ActionLink("Details", "GetTask", new { id = item.Id }, new { @class = "btn btn-primary" }) |
-            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-primary" })
+            
+        @Html.ActionLink("Edit", "Update", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+        @Html.ActionLink("Details", "GetTask", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+        @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-primary" })
         </td>
     </tr>
 }
@@ -114,58 +118,38 @@
             }
         });
 
-        function checkBoxClick() {
-            const self = $(this);
-            $('tr .row-checkbox').each(function () {
-                var closestTrId = $(this).closest('tr').attr('id');
-                var checkedRow = $(this).closest('tr');
+        
+            
+        $('tr .row-checkbox').click(function (event) {
+            var eventRow = event.target.closest('tr');
+            var closestTrId = event.target.closest('tr')['id'];
+            var checkedRow = $(this).closest('tr');
+            if (event.target.checked) {
+                checkedRow.css('background-color', 'pink');
+                checkedRow.find("#column").text('Completed');
+            }
+            else {
+                checkedRow.css('background-color', 'white');
+                checkedRow.find("#column").text('Pending');
+            }
+            obj = {
+                Id: closestTrId,
+                TaskName: eventRow.cells[1].innerText,
+                Description: eventRow.cells[2].innerText,
+                Status: event.target.checked ? "Y" : "N"
+            };
+            $.ajax({
+                url: '/Home/Update',
+                method: 'post',
+                data: obj,
+                success: function (data) {
 
-                if (this.checked) {
-                    checkedRow.css('background-color', 'pink');
-                    checkedRow.find("#column").text('Completed');
-                    obj = {
-                        Id: closestTrId,
-                        TaskName: checkedRow[0].cells[1].innerText,
-                        Description: checkedRow[0].cells[2].innerText,
-                        Status: "Y"
-                    };
-                    $.ajax({
-                        url: '/Home/Update',
-                        method: 'post',
-                        data: obj,
-                        success: function (data) {
-                            
-                        },
-                        error: function (err) {
-                            console.log(error);
-                        }
-                    });
-                }
-                else {
-                    checkedRow.css('background-color', 'white');
-                    checkedRow.find("#column").text('Pending');
-                    obj = {
-                        Id: closestTrId,
-                        TaskName: checkedRow[0].cells[1].innerText,
-                        Description: checkedRow[0].cells[2].innerText,
-                        Status: "N"
-
-                    };
-                    $.ajax({
-                        url: '/Home/Update',
-                        method: 'post',
-                        data: obj,
-                        success: function (data) {
-                            
-                        },
-                        error: function (err) {
-                            console.log(error);
-                        }
-                    });
+                },
+                error: function (err) {
+                    console.log(error);
                 }
             });
-
-        }
+        });
     }
 
 </script>

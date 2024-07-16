@@ -11,6 +11,7 @@ using System.Data.Entity.Migrations;
 
 namespace ToDoWebsite.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         ToDoListAdoRepository repository;
@@ -26,12 +27,14 @@ namespace ToDoWebsite.Controllers
             var result = repository.GetAllTasks();
             return View(result);
         }
+        [Authorize(Roles = "Admin, Customer")]
         public ActionResult Create()
         {
-            return View();
+           return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin, Customer")]
         public ActionResult Create(ToDOListEntity model)
         {
             if (ModelState.IsValid)
@@ -65,7 +68,7 @@ namespace ToDoWebsite.Controllers
             var result = repository.GetTask(id);
             return View(result);
         }
-
+        [Authorize(Roles = "Admin")]
         public ActionResult Update(int id)
         {
             var result = repository.GetTask(id);
@@ -73,6 +76,7 @@ namespace ToDoWebsite.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult Update(ToDOListEntity model)
         {
             if (model != null)
@@ -91,7 +95,7 @@ namespace ToDoWebsite.Controllers
             }
             return RedirectToAction("GetAllTasks");
         }
-
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int id)
         {
             var result = repository.DeleteTask(id);
